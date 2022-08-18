@@ -28,6 +28,10 @@ internal class SubstitutionCipherTest
         "y" to "6", "z" to "*",
     )
 
+    private val naturalString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
+    private val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
+    private val gboard1String = "@;'€3_&-8+()?!/9014#57:2\"6* @!€ 9\"9_3?0@)"
+
 
     @BeforeEach
     fun onBefore()
@@ -52,66 +56,50 @@ internal class SubstitutionCipherTest
     @Test
     fun `Morse - Decode an encoded string must be equal to the original one`()
     {
-        val initialString = "supercalifragilisticexpialidocious and oxofempal"
-
-        val encodedString = morseCipher.encode(initialString)
+        val encodedString = morseCipher.encode(naturalString)
         val decodedString = morseCipher.decode(encodedString)
 
-        assertThat(decodedString).isEqualTo(initialString)
+        assertThat(decodedString).isEqualTo(naturalString)
     }
 
     @Test
     fun `Morse - Encode is correct`()
     {
-        val initialString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
+        val encodedString = morseCipher.encode(naturalString)
 
-        val encodedString = morseCipher.encode(initialString)
-        val expectedEncodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
-
-        assertThat(encodedString).isEqualTo(expectedEncodedString)
+        assertThat(encodedString).isEqualTo(morseString)
     }
 
     @Test
     fun `Morse - Decode is correct`()
     {
-        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
+        val decodedString = morseCipher.decode(morseString)
 
-        val decodedString = morseCipher.decode(initialString)
-        val expectedDecodedString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
-
-        assertThat(decodedString).isEqualTo(expectedDecodedString)
+        assertThat(decodedString).isEqualTo(naturalString)
     }
 
     @Test
     fun `GBoard1 - Decode an encoded string must be equal to the original one`()
     {
-        val initialString = "supercalifragilisticexpialidocious and oxofempal"
-
-        val encodedString = gboard1Cipher.encode(initialString)
+        val encodedString = gboard1Cipher.encode(naturalString)
         val decodedString = gboard1Cipher.decode(encodedString)
 
-        assertThat(decodedString).isEqualTo(initialString)
+        assertThat(decodedString).isEqualTo(naturalString)
     }
 
     @Test
     fun `GBoard1 - Encode is correct`()
     {
-        val initialString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
+        val encodedString = gboard1Cipher.encode(naturalString)
 
-        val encodedString = gboard1Cipher.encode(initialString)
-        val expectedEncodedString = "@;'€3_&-8+()?!/9014#57:2\"6* @!€ 9\"9_3?0@)"
-
-        assertThat(encodedString).isEqualTo(expectedEncodedString)
+        assertThat(encodedString).isEqualTo(gboard1String)
     }
 
     @Test
     fun `GBoard1 - Decode is correct`()
     {
-        val initialString = "@;'€3_&-8+()?!/9014#57:2\"6* @!€ 9\"9_3?0@)"
+        val decodedString = gboard1Cipher.decode(gboard1String)
 
-        val decodedString = gboard1Cipher.decode(initialString)
-        val expectedDecodedString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
-
-        assertThat(decodedString).isEqualTo(expectedDecodedString)
+        assertThat(decodedString).isEqualTo(naturalString)
     }
 }
