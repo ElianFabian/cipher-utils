@@ -47,7 +47,7 @@ class SubstitutionCipher(
         var _wordSeparator = ""
         var _symbolSeparator = ""
 
-        stringToTranslate.split(symbolSeparator + wordSeparator + symbolSeparator).forEach { word ->
+        stringToTranslate.trim().split(symbolSeparator + wordSeparator + symbolSeparator).forEach { word ->
 
             translatedSB.append(_wordSeparator)
 
@@ -61,9 +61,7 @@ class SubstitutionCipher(
             translatedSB.append(_symbolSeparator)
             _wordSeparator = translatedWordSeparator
         }
-
-        if(wordSeparator == " ") translatedSB.setLength(translatedSB.length - 1)
-
-        return translatedSB.toString()
+        
+        return translatedSB.toString().trim()
     }
 }
