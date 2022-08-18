@@ -37,7 +37,8 @@ class ShiftCipher(
         var _wordSeparator = ""
         var _symbolSeparator = ""
         var symbolIndex = 0
-        stringToTranslate.split(symbolSeparator + wordSeparator + symbolSeparator).forEach { word ->
+
+        stringToTranslate.trim().split(symbolSeparator + wordSeparator + symbolSeparator).forEach { word ->
 
             translatedSB.append(_wordSeparator)
 
@@ -56,9 +57,7 @@ class ShiftCipher(
             _wordSeparator = wordSeparator
         }
 
-        if (symbolSeparator != "") translatedSB.setLength(translatedSB.length - 1)
-
-        return translatedSB.toString()
+        return translatedSB.toString().trim()
     }
 
     private fun shift(symbol: String, offset: Int): String
