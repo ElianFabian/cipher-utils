@@ -7,16 +7,9 @@ import org.junit.jupiter.api.Test
 
 internal class ShiftCipherTest
 {
-    private lateinit var alphabetCipher: ShiftCipher
-    private lateinit var morseCipher: ShiftCipher
+    private lateinit var cipher: ShiftCipher
 
-    val alphabetSet = setOf(
-        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-        "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-        "u", "v", "w", "x", "y", "z"
-    )
-
-    val morseSet = setOf(
+    private val morseSet = setOf(
         ".-", "-...", "-.-.", "-..", ".",
         "..-.", "--.", "....", "..", ".---",
         "-.-", ".-..", "--", "-.", "--.--",
@@ -33,62 +26,44 @@ internal class ShiftCipherTest
     @BeforeEach
     fun onBefore()
     {
-        alphabetCipher = ShiftCipher(
-            alphabetSet,
-            wordSeparator = " ",
-            symbolSeparator = "",
-            cipherKey = "abc"
-        )
-
-        morseCipher = ShiftCipher(
+        cipher = ShiftCipher(
             morseSet,
             wordSeparator = "/",
             symbolSeparator = " ",
-            cipherKey = "-. -... -.-."
+            cipherKey = ".- -... -.-."
         )
     }
 
     @Test
-    fun `Alphabet - The decoded string of an encoded string must be equal to the original string`()
+    fun `Decode an encoded string must be equal to the original one`()
     {
-        val initialString = "the quick foxy jumps over the lazy dog"
+        val initialString = "- .... . / --.- ..- .. -.-. -.- / ..-. --- -..- -.-- / .--- ..- -- .--. ... / --- ...- . .-. / - .... . / .-.. .- --.. -.-- / -.. --- --."
 
-        val encodedString = alphabetCipher.encode(initialString)
-        val decodedString = alphabetCipher.decode(encodedString)
+        val encodedString = cipher.encode(initialString)
+        val decodedString = cipher.decode(encodedString)
 
         assertThat(decodedString).isEqualTo(initialString)
     }
 
     @Test
-    fun `Morse - The decoded string of an encoded string must be equal to the original string`()
+    fun `Encode is correct`()
     {
-        val initialString = "- .... . / --.- ..- .. -.-. -.- / ..-. --- -..- -.-- / .--- ..- -- .--. ... / --- ...- . .-. / - .... . / .-.. .- --.. -.-- / -.. --- --."
+        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
 
-        val encodedString = morseCipher.encode(initialString)
-        val decodedString = morseCipher.decode(encodedString)
+        val encodedString = cipher.encode(initialString)
+        val expectedEncodedString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- ----- ..--- / .---- ...-- ..... ....- -.... ---.. --... ----. -.-.-- .-.-.-"
 
-        assertThat(decodedString).isEqualTo(initialString)
+        assertThat(encodedString).isEqualTo(expectedEncodedString)
     }
-//
-//    @Test
-//    fun `Alphabet - Check encoding is correct`()
-//    {
-//        val initialString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
-//
-//        val encodedString = cipher.encode(initialString)
-//        val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
-//
-//        assertThat(encodedString).isEqualTo(morseString)
-//    }
-//
-//    @Test
-//    fun `Morse - Check decoding is correct`()
-//    {
-//        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
-//
-//        val decodedString = cipher.decode(initialString)
-//        val naturalString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
-//
-//        assertThat(decodedString).isEqualTo(naturalString)
-//    }
+
+    @Test
+    fun `Decode is correct`()
+    {
+        val initialString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- ----- ..--- / .---- ...-- ..... ....- -.... ---.. --... ----. -.-.-- .-.-.-"
+
+        val decodedString = cipher.decode(initialString)
+        val expectedDecodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
+
+        assertThat(decodedString).isEqualTo(expectedDecodedString)
+    }
 }
