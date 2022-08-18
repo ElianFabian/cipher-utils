@@ -15,13 +15,11 @@ internal class ShiftCipherTest
         "-.-", ".-..", "--", "-.", "--.--",
         "---", ".--.", "--.-", ".-.", "...",
         "-", "..-", "...-", ".--", "-..-",
-        "-.--", "--..",
-        "-----", ".----", "..---", "...--",
-        "....-", ".....", "-....", "--...",
-        "---..", "----.",
-        ".-.-.-", "-.-.--", "..--..", ".-..-."
+        "-.--", "--.."
     )
 
+    private val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.."
+    private val shiftedMorseString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- .- -.-."
 
     @BeforeEach
     fun onBefore()
@@ -37,33 +35,25 @@ internal class ShiftCipherTest
     @Test
     fun `Decode an encoded string must be equal to the original one`()
     {
-        val initialString = "- .... . / --.- ..- .. -.-. -.- / ..-. --- -..- -.-- / .--- ..- -- .--. ... / --- ...- . .-. / - .... . / .-.. .- --.. -.-- / -.. --- --."
-
-        val encodedString = cipher.encode(initialString)
+        val encodedString = cipher.encode(morseString)
         val decodedString = cipher.decode(encodedString)
 
-        assertThat(decodedString).isEqualTo(initialString)
+        assertThat(decodedString).isEqualTo(morseString)
     }
 
     @Test
     fun `Encode is correct`()
     {
-        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
+        val encodedString = cipher.encode(morseString)
 
-        val encodedString = cipher.encode(initialString)
-        val expectedEncodedString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- ----- ..--- / .---- ...-- ..... ....- -.... ---.. --... ----. -.-.-- .-.-.-"
-
-        assertThat(encodedString).isEqualTo(expectedEncodedString)
+        assertThat(encodedString).isEqualTo(shiftedMorseString)
     }
 
     @Test
     fun `Decode is correct`()
     {
-        val initialString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- ----- ..--- / .---- ...-- ..... ....- -.... ---.. --... ----. -.-.-- .-.-.-"
+        val decodedString = cipher.decode(shiftedMorseString)
 
-        val decodedString = cipher.decode(initialString)
-        val expectedDecodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
-
-        assertThat(decodedString).isEqualTo(expectedDecodedString)
+        assertThat(decodedString).isEqualTo(morseString)
     }
 }
