@@ -15,11 +15,7 @@ internal class SubstitutionCipherTest
         "k" to "-.-", "l" to ".-..", "m" to "--", "n" to "-.", "ñ" to "--.--",
         "o" to "---", "p" to ".--.", "q" to "--.-", "r" to ".-.", "s" to "...",
         "t" to "-", "u" to "..-", "v" to "...-", "w" to ".--", "x" to "-..-",
-        "y" to "-.--", "z" to "--..",
-        "0" to "-----", "1" to ".----", "2" to "..---", "3" to "...--",
-        "4" to "....-", "5" to ".....", "6" to "-....", "7" to "--...",
-        "8" to "---..", "9" to "----.",
-        "." to ".-.-.-", "," to "-.-.--", "?" to "..--..", "\"" to ".-..-."
+        "y" to "-.--", "z" to "--.."
     )
 
 
@@ -38,7 +34,7 @@ internal class SubstitutionCipherTest
     @Test
     fun `Decode an encoded string must be equal to the original one`()
     {
-        val initialString = "supercalifragilisticexpialidocious and 299792485"
+        val initialString = "supercalifragilisticexpialidocious and oxofempal"
 
         val encodedString = cipher.encode(initialString)
         val decodedString = cipher.decode(encodedString)
@@ -49,10 +45,10 @@ internal class SubstitutionCipherTest
     @Test
     fun `Encode is correct`()
     {
-        val initialString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
+        val initialString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
 
         val encodedString = cipher.encode(initialString)
-        val expectedEncodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
+        val expectedEncodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
 
         assertThat(encodedString).isEqualTo(expectedEncodedString)
     }
@@ -60,10 +56,10 @@ internal class SubstitutionCipherTest
     @Test
     fun `Decode is correct`()
     {
-        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
+        val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
 
         val decodedString = cipher.decode(initialString)
-        val expectedDecodedString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
+        val expectedDecodedString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
 
         assertThat(decodedString).isEqualTo(expectedDecodedString)
     }
