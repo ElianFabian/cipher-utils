@@ -36,7 +36,7 @@ internal class SubstitutionCipherTest
     }
 
     @Test
-    fun `The decoded string of an encoded string must be equal to the original string`()
+    fun `Decode an encoded string must be equal to the original one`()
     {
         val initialString = "supercalifragilisticexpialidocious and 299792485"
 
@@ -47,24 +47,24 @@ internal class SubstitutionCipherTest
     }
 
     @Test
-    fun `Check encoding is correct`()
+    fun `Encode is correct`()
     {
         val initialString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
 
         val encodedString = cipher.encode(initialString)
-        val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
-        
-        assertThat(encodedString).isEqualTo(morseString)
+        val expectedEncodedString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
+
+        assertThat(encodedString).isEqualTo(expectedEncodedString)
     }
 
     @Test
-    fun `Check decoding is correct`()
+    fun `Decode is correct`()
     {
         val initialString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / ----- .---- ..--- ...-- ....- ..... -.... --... ---.. ----."
-        
+
         val decodedString = cipher.decode(initialString)
-        val naturalString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
-        
-        assertThat(decodedString).isEqualTo(naturalString)
+        val expectedDecodedString = "abcdefghijklmnñopqrstuvwxyz 0123456789"
+
+        assertThat(decodedString).isEqualTo(expectedDecodedString)
     }
 }
