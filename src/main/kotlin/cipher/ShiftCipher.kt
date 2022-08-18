@@ -1,6 +1,7 @@
 package cipher
 
 import Cipher
+import FirstIndexType
 import util.mod
 import util.splitWord
 
@@ -67,9 +68,4 @@ class ShiftCipher(
 
         return symbolSet.elementAt(newIndex)
     }
-}
-
-enum class FirstIndexType
-{
-    ZERO, ONE
 }
