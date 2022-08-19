@@ -19,7 +19,7 @@ internal class SubstitutionCipherTest
         "y" to "-.--", "z" to "--.."
     )
 
-    private val toGBoard1 = mapOf(
+    private val toGboard1 = mapOf(
         "a" to "@", "b" to ";", "c" to "'", "d" to "€", "e" to "3",
         "f" to "_", "g" to "&", "h" to "-", "i" to "8", "j" to "+",
         "k" to "(", "l" to ")", "m" to "?", "n" to "!", "ñ" to "/",
@@ -45,7 +45,7 @@ internal class SubstitutionCipherTest
         )
 
         gboard1Cipher = SubstitutionCipher(
-            toGBoard1,
+            toGboard1,
             decodedWordSeparator = " ",
             decodedSymbolSeparator = "",
             encodedWordSeparator = " ",
