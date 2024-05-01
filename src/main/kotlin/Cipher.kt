@@ -1,5 +1,4 @@
-interface Cipher
-{
-    fun encode(stringToEncode: String): String
-    fun decode(stringToDecode: String): String
+interface Cipher {
+	fun encode(decodedText: String): String
+	fun decode(encodedText: String): String
 }

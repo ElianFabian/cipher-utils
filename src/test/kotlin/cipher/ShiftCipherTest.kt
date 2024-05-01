@@ -5,97 +5,146 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 
-internal class ShiftCipherTest
-{
-    private lateinit var morseCipher: ShiftCipher
-    private lateinit var alphabetCipher: ShiftCipher
+internal class ShiftCipherTest {
 
-    private val morseSet = setOf(
-        ".-", "-...", "-.-.", "-..", ".",
-        "..-.", "--.", "....", "..", ".---",
-        "-.-", ".-..", "--", "-.", "--.--",
-        "---", ".--.", "--.-", ".-.", "...",
-        "-", "..-", "...-", ".--", "-..-",
-        "-.--", "--.."
-    )
+	private lateinit var morseCipher: ShiftCipher
+	private lateinit var alphabetCipher: ShiftCipher
 
-    private val alphabetSet = setOf(
-        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-        "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t",
-        "u", "v", "w", "x", "y", "z"
-    )
+	private val morseSet = setOf(
+		".-",
+		"-...",
+		"-.-.",
+		"-..",
+		".",
+		"..-.",
+		"--.",
+		"....",
+		"..",
+		".---",
+		"-.-",
+		".-..",
+		"--",
+		"-.",
+		"--.--",
+		"---",
+		".--.",
+		"--.-",
+		".-.",
+		"...",
+		"-",
+		"..-",
+		"...-",
+		".--",
+		"-..-",
+		"-.--",
+		"--..",
+	)
 
-    private val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
-    private val shiftedMorseString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- .- -.-. / -... --- --. / .--. --.. .-. --. --. --- --.- -.-. --.--"
+	private val alphabetSet = setOf(
+		"a",
+		"b",
+		"c",
+		"d",
+		"e",
+		"f",
+		"g",
+		"h",
+		"i",
+		"j",
+		"k",
+		"l",
+		"m",
+		"n",
+		"ñ",
+		"o",
+		"p",
+		"q",
+		"r",
+		"s",
+		"t",
+		"u",
+		"v",
+		"w",
+		"x",
+		"y",
+		"z",
+	)
 
-    private val alphabetString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
-    private val shiftedAlphabetString = "bdfegihjlkmñnoqprtsuwvxzyac bog pzrggoqcñ"
+	private val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
+	private val shiftedMorseString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- .- -.-. / -... --- --. / .--. --.. .-. --. --. --- --.- -.-. --.--"
 
-    @BeforeEach
-    fun onBefore()
-    {
-        morseCipher = ShiftCipher(
-            morseSet,
-            wordSeparator = "/",
-            symbolSeparator = " ",
-            cipherKey = ".- -... -.-."
-        )
+	private val alphabetString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
+	private val shiftedAlphabetString = "bdfegihjlkmñnoqprtsuwvxzyac bog pzrggoqcñ"
 
-        alphabetCipher = ShiftCipher(
-            alphabetSet,
-            wordSeparator = " ",
-            symbolSeparator = "",
-            cipherKey = "abc"
-        )
-    }
 
-    @Test
-    fun `Morse - Decode an encoded string must be equal to the original one`()
-    {
-        val encodedString = morseCipher.encode(morseString)
-        val decodedString = morseCipher.decode(encodedString)
+	@BeforeEach
+	fun onBefore() {
+		morseCipher = ShiftCipher(
+			symbolSet = morseSet,
+			wordSeparator = "/",
+			symbolSeparator = " ",
+			keyCollection = listOf(
+				".-",
+				"-...",
+				"-.-.",
+			),
+			isZeroBased = false,
+		)
 
-        assertThat(decodedString).isEqualTo(morseString)
-    }
+		alphabetCipher = ShiftCipher(
+			symbolSet = alphabetSet,
+			wordSeparator = " ",
+			symbolSeparator = "",
+			keyCollection = listOf(
+				"a",
+				"b",
+				"c",
+			),
+			isZeroBased = false,
+		)
+	}
 
-    @Test
-    fun `Morse - Encode is correct`()
-    {
-        val encodedString = morseCipher.encode(morseString)
+	@Test
+	fun `Morse - Decrypt an encoded string must be equal to the original one`() {
+		val encodedString = morseCipher.encrypt(morseString)
+		val decodedString = morseCipher.decrypt(encodedString)
 
-        assertThat(encodedString).isEqualTo(shiftedMorseString)
-    }
+		assertThat(decodedString).isEqualTo(morseString)
+	}
 
-    @Test
-    fun `Morse - Decode is correct`()
-    {
-        val decodedString = morseCipher.decode(shiftedMorseString)
+	@Test
+	fun `Morse - Encrypt is correct`() {
+		val encodedString = morseCipher.encrypt(morseString)
 
-        assertThat(decodedString).isEqualTo(morseString)
-    }
+		assertThat(encodedString).isEqualTo(shiftedMorseString)
+	}
 
-    @Test
-    fun `Alphabet - Decode an encoded string must be equal to the original one`()
-    {
-        val encodedString = alphabetCipher.encode(alphabetString)
-        val decodedString = alphabetCipher.decode(encodedString)
+	@Test
+	fun `Morse - Decrypt is correct`() {
+		val decodedString = morseCipher.decrypt(shiftedMorseString)
 
-        assertThat(decodedString).isEqualTo(alphabetString)
-    }
+		assertThat(decodedString).isEqualTo(morseString)
+	}
 
-    @Test
-    fun `Alphabet - Encode is correct`()
-    {
-        val encodedString = alphabetCipher.encode(alphabetString)
+	@Test
+	fun `Alphabet - Decrypt an encoded string must be equal to the original one`() {
+		val encodedString = alphabetCipher.encrypt(alphabetString)
+		val decodedString = alphabetCipher.decrypt(encodedString)
 
-        assertThat(encodedString).isEqualTo(shiftedAlphabetString)
-    }
+		assertThat(decodedString).isEqualTo(alphabetString)
+	}
 
-    @Test
-    fun `Alphabet - Decode is correct`()
-    {
-        val decodedString = alphabetCipher.decode(shiftedAlphabetString)
+	@Test
+	fun `Alphabet - Encrypt is correct`() {
+		val encodedString = alphabetCipher.encrypt(alphabetString)
 
-        assertThat(decodedString).isEqualTo(alphabetString)
-    }
+		assertThat(encodedString).isEqualTo(shiftedAlphabetString)
+	}
+
+	@Test
+	fun `Alphabet - Decrypt is correct`() {
+		val decodedString = alphabetCipher.decrypt(shiftedAlphabetString)
+
+		assertThat(decodedString).isEqualTo(alphabetString)
+	}
 }
