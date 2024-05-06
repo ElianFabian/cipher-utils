@@ -78,27 +78,26 @@ internal class SubstitutionCipherTest {
 	@BeforeEach
 	fun onBefore() {
 		morseCipher = SubstitutionCipher(
-			encodeMap = toMorseMap,
-			decodedWordSeparator = " ",
-			decodedSymbolSeparator = "",
-			encodedWordSeparator = "/",
-			encodedSymbolSeparator = " ",
+			encryptMap = toMorseMap,
+			wordSeparator = " ",
+			symbolSeparator = "",
+			encryptedWordSeparator = "/",
+			encryptedSymbolSeparator = " ",
 		)
 
 		gboard1Cipher = SubstitutionCipher(
-			encodeMap = toGboard1,
-			decodedWordSeparator = " ",
-			decodedSymbolSeparator = "",
-			encodedWordSeparator = " ",
-			encodedSymbolSeparator = "",
+			encryptMap = toGboard1,
+			wordSeparator = " ",
+			symbolSeparator = "",
+			encryptedWordSeparator = " ",
+			encryptedSymbolSeparator = "",
 		)
 	}
 
 	@Test
 	fun `Morse - Decrypt an encoded string must be equal to the original one`() {
 		val encodedString = morseCipher.encrypt(naturalString)
-		assertThat(encodedString).isNotNull()
-		val decodedString = morseCipher.decrypt(encodedString!!)
+		val decodedString = morseCipher.decrypt(encodedString)
 
 		assertThat(decodedString).isEqualTo(naturalString)
 	}
@@ -120,8 +119,7 @@ internal class SubstitutionCipherTest {
 	@Test
 	fun `GBoard1 - Decrypt an encoded string must be equal to the original one`() {
 		val encodedString = gboard1Cipher.encrypt(naturalString)
-		assertThat(encodedString).isNotNull()
-		val decodedString = gboard1Cipher.decrypt(encodedString!!)
+		val decodedString = gboard1Cipher.decrypt(encodedString)
 
 		assertThat(decodedString).isEqualTo(naturalString)
 	}

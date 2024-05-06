@@ -1,150 +1,198 @@
 package cipher
 
+import cipher.data.AlphabetSet
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvFileSource
+import kotlin.test.assertFailsWith
 
 internal class ShiftCipherTest {
 
-	private lateinit var morseCipher: ShiftCipher
 	private lateinit var alphabetCipher: ShiftCipher
-
-	private val morseSet = setOf(
-		".-",
-		"-...",
-		"-.-.",
-		"-..",
-		".",
-		"..-.",
-		"--.",
-		"....",
-		"..",
-		".---",
-		"-.-",
-		".-..",
-		"--",
-		"-.",
-		"--.--",
-		"---",
-		".--.",
-		"--.-",
-		".-.",
-		"...",
-		"-",
-		"..-",
-		"...-",
-		".--",
-		"-..-",
-		"-.--",
-		"--..",
-	)
-
-	private val alphabetSet = setOf(
-		"a",
-		"b",
-		"c",
-		"d",
-		"e",
-		"f",
-		"g",
-		"h",
-		"i",
-		"j",
-		"k",
-		"l",
-		"m",
-		"n",
-		"ñ",
-		"o",
-		"p",
-		"q",
-		"r",
-		"s",
-		"t",
-		"u",
-		"v",
-		"w",
-		"x",
-		"y",
-		"z",
-	)
-
-	private val morseString = ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --.-- --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --.. / .- -. -.. / --- -..- --- ..-. . -- .--. .- .-.."
-	private val shiftedMorseString = "-... -.. ..-. . --. .. .... .--- .-.. -.- -- --.-- -. --- --.- .--. .-. - ... ..- .-- ...- -..- --.. -.-- .- -.-. / -... --- --. / .--. --.. .-. --. --. --- --.- -.-. --.--"
-
-	private val alphabetString = "abcdefghijklmnñopqrstuvwxyz and oxofempal"
-	private val shiftedAlphabetString = "bdfegihjlkmñnoqprtsuwvxzyac bog pzrggoqcñ"
 
 
 	@BeforeEach
 	fun onBefore() {
-		morseCipher = ShiftCipher(
-			symbolSet = morseSet,
-			wordSeparator = "/",
-			symbolSeparator = " ",
-			keyCollection = listOf(
-				".-",
-				"-...",
-				"-.-.",
-			),
-			isZeroBased = false,
-		)
-
 		alphabetCipher = ShiftCipher(
-			symbolSet = alphabetSet,
+			symbolSet = AlphabetSet,
 			wordSeparator = " ",
 			symbolSeparator = "",
-			keyCollection = listOf(
-				"a",
-				"b",
-				"c",
-			),
-			isZeroBased = false,
 		)
 	}
 
 	@Test
-	fun `Morse - Decrypt an encoded string must be equal to the original one`() {
-		val encodedString = morseCipher.encrypt(morseString)
-		val decodedString = morseCipher.decrypt(encodedString)
-
-		assertThat(decodedString).isEqualTo(morseString)
+	fun `Symbol set can't be empty`() {
+		assertFailsWith<IllegalArgumentException> {
+			ShiftCipher(
+				symbolSet = emptySet(),
+				symbolSeparator = "",
+				wordSeparator = " ",
+			)
+		}
 	}
 
 	@Test
-	fun `Morse - Encrypt is correct`() {
-		val encodedString = morseCipher.encrypt(morseString)
-
-		assertThat(encodedString).isEqualTo(shiftedMorseString)
+	fun `Key collection can't be empty`() {
+		assertFailsWith<IllegalArgumentException> {
+			ShiftCipher(
+				symbolSet = AlphabetSet,
+				symbolSeparator = "",
+				wordSeparator = " ",
+				keyCollection = emptyList(),
+			)
+		}
+		assertFailsWith<IllegalArgumentException> {
+			val cipher = ShiftCipher(
+				symbolSet = AlphabetSet,
+				symbolSeparator = "",
+				wordSeparator = " ",
+			)
+			cipher.keyCollection = emptyList()
+		}
 	}
 
 	@Test
-	fun `Morse - Decrypt is correct`() {
-		val decodedString = morseCipher.decrypt(shiftedMorseString)
-
-		assertThat(decodedString).isEqualTo(morseString)
+	fun `Symbol separator can't be equal to word separator`() {
+		val symbolSeparators = setOf(
+			"", ".", ",", "_", ":", "/"
+		)
+		symbolSeparators.forEach { symbol ->
+			assertFailsWith<IllegalArgumentException> {
+				ShiftCipher(
+					symbolSet = AlphabetSet,
+					symbolSeparator = symbol,
+					wordSeparator = symbol,
+				)
+			}
+		}
 	}
 
 	@Test
-	fun `Alphabet - Decrypt an encoded string must be equal to the original one`() {
-		val encodedString = alphabetCipher.encrypt(alphabetString)
-		val decodedString = alphabetCipher.decrypt(encodedString)
-
-		assertThat(decodedString).isEqualTo(alphabetString)
+	fun `Symbol separator can't be in symbol set`() {
+		val symbolSeparators = setOf(
+			"", ".", ",", "_", ":"
+		)
+		symbolSeparators.forEach { symbol ->
+			assertFailsWith<IllegalArgumentException> {
+				ShiftCipher(
+					symbolSet = AlphabetSet + symbol,
+					symbolSeparator = symbol,
+					wordSeparator = "/",
+				)
+			}
+		}
 	}
 
 	@Test
-	fun `Alphabet - Encrypt is correct`() {
-		val encodedString = alphabetCipher.encrypt(alphabetString)
-
-		assertThat(encodedString).isEqualTo(shiftedAlphabetString)
+	fun `Word separator can't be in symbol set`() {
+		val wordSeparators = setOf(
+			"", ".", ",", "_", ":"
+		)
+		wordSeparators.forEach { symbol ->
+			assertFailsWith<IllegalArgumentException> {
+				ShiftCipher(
+					symbolSet = AlphabetSet + symbol,
+					symbolSeparator = "/",
+					wordSeparator = symbol,
+				)
+			}
+		}
 	}
 
 	@Test
-	fun `Alphabet - Decrypt is correct`() {
-		val decodedString = alphabetCipher.decrypt(shiftedAlphabetString)
+	fun `On conflict strategy works as expected`() {
+		val cipher = ShiftCipher(
+			symbolSet = AlphabetSet,
+			symbolSeparator = "",
+			wordSeparator = " ",
+			keyCollection = listOf("a"),
+		)
 
-		assertThat(decodedString).isEqualTo(alphabetString)
+		cipher.onConflictStrategy = ShiftCipher.OnConflictStrategy.Default
+
+		val text = "hello world with Ñ"
+
+		assertFailsWith<IllegalArgumentException> {
+			cipher.encrypt(text)
+		}
+		assertThat(cipher.encryptOrNull(text)).isNull()
+
+		assertFailsWith<IllegalArgumentException> {
+			cipher.decrypt(text)
+		}
+		assertThat(cipher.decryptOrNull(text)).isNull()
+
+
+		cipher.onConflictStrategy = ShiftCipher.OnConflictStrategy.Ignore
+
+		assertDoesNotThrow {
+			cipher.encrypt(text)
+		}
+		assertThat(cipher.encryptOrNull(text)).isNotNull()
+
+		assertDoesNotThrow {
+			cipher.decrypt(text)
+		}
+		assertThat(cipher.decryptOrNull(text)).isNotNull()
+	}
+
+	@Test
+	fun `Character can't be in both symbol separator and symbol set`() {
+		val set = setOf("alpha", "beta", "delta")
+		val characters = set.joinToString("")
+
+		characters.forEach { char ->
+			assertFailsWith<IllegalArgumentException> {
+				ShiftCipher(
+					symbolSet = set,
+					symbolSeparator = "<$char>",
+					wordSeparator = ".",
+				)
+			}
+		}
+	}
+
+	@Test
+	fun `Character can't be in both word separator and symbol set`() {
+		val set = setOf("alpha", "beta", "delta")
+		val characters = set.joinToString("")
+
+		characters.forEach { char ->
+			assertFailsWith<IllegalArgumentException> {
+				ShiftCipher(
+					symbolSet = set,
+					symbolSeparator = ".",
+					wordSeparator = "<$char>",
+				)
+			}
+		}
+	}
+
+	@CsvFileSource(
+		resources = [
+			"/shift-cipher-alphabet-data.csv",
+		],
+		numLinesToSkip = 1,
+	)
+	@ParameterizedTest
+	fun `Alphabet - Expected value matches actual value and encryption can be reversed`(
+		key: String,
+		sourceText: String,
+		expectedEncryptedText: String,
+		isZeroBased: Boolean,
+	) {
+		alphabetCipher.apply {
+			this.key = key
+			this.isZeroBased = isZeroBased
+		}
+
+		val encryptedText = alphabetCipher.encrypt(sourceText)
+		assertThat(encryptedText).isEqualTo(expectedEncryptedText)
+
+		val decryptedText = alphabetCipher.decrypt(encryptedText)
+		assertThat(decryptedText).isEqualTo(sourceText)
 	}
 }

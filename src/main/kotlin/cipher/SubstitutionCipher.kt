@@ -3,59 +3,62 @@ package cipher
 import util.trimmedSplit
 
 class SubstitutionCipher(
-	val encodeMap: Map<String, String>,
-	val decodedWordSeparator: String,
-	val decodedSymbolSeparator: String,
-	val encodedWordSeparator: String,
-	val encodedSymbolSeparator: String,
+	val encryptMap: Map<String, String>,
+	val wordSeparator: String,
+	val symbolSeparator: String,
+	val encryptedSymbolSeparator: String,
+	val encryptedWordSeparator: String,
 ) {
 	init {
-		checkValueNotInMap(decodedWordSeparator) {
-			"decodedWordSeparator can't be in encodeMap"
+		check(encryptMap.isNotEmpty()) {
+			"Encode map set can't be empty"
 		}
-		checkValueNotInMap(decodedSymbolSeparator) {
-			"decodedSymbolSeparator can't be in encodeMap"
+		checkValueNotInMap(wordSeparator) {
+			"decodedWordSeparator can't be in encryptMap"
 		}
-		checkValueNotInMap(encodedWordSeparator) {
-			"encodedWordSeparator can't be in encodeMap"
+		checkValueNotInMap(symbolSeparator) {
+			"decodedSymbolSeparator can't be in encryptMap"
 		}
-		checkValueNotInMap(encodedSymbolSeparator) {
-			"encodedSymbolSeparator can't be in encodeMap"
+		checkValueNotInMap(encryptedWordSeparator) {
+			"encodedWordSeparator can't be in encryptMap"
+		}
+		checkValueNotInMap(encryptedSymbolSeparator) {
+			"encodedSymbolSeparator can't be in encryptMap"
 		}
 	}
 
 
-	private val _decodeMap = encodeMap.entries.associateBy({ it.value }) { it.key }
+	private val _decryptMap = encryptMap.entries.associateBy({ it.value }) { it.key }
 	private val _translatedSb = StringBuilder("")
 
 
-	fun encrypt(decodedText: String): String? = translate(
+	fun encrypt(decodedText: String): String = translate(
 		textToTranslate = decodedText,
-		translationMap = encodeMap,
-		wordSeparator = decodedWordSeparator,
-		symbolSeparator = decodedSymbolSeparator,
-		translatedWordSeparator = encodedWordSeparator,
-		translatedSymbolSeparator = encodedSymbolSeparator,
+		translationMap = encryptMap,
+		symbolSeparator = symbolSeparator,
+		wordSeparator = wordSeparator,
+		translatedWordSeparator = encryptedWordSeparator,
+		translatedSymbolSeparator = encryptedSymbolSeparator,
 	)
 
-	fun decrypt(encodedText: String): String? = translate(
+	fun decrypt(encodedText: String): String = translate(
 		textToTranslate = encodedText,
-		translationMap = _decodeMap,
-		wordSeparator = encodedWordSeparator,
-		symbolSeparator = encodedSymbolSeparator,
-		translatedWordSeparator = decodedWordSeparator,
-		translatedSymbolSeparator = decodedSymbolSeparator,
+		translationMap = _decryptMap,
+		symbolSeparator = encryptedSymbolSeparator,
+		wordSeparator = encryptedWordSeparator,
+		translatedWordSeparator = wordSeparator,
+		translatedSymbolSeparator = symbolSeparator,
 	)
 
 
 	private fun translate(
 		textToTranslate: String,
 		translationMap: Map<String, String>,
-		wordSeparator: String,
 		symbolSeparator: String,
+		wordSeparator: String,
 		translatedWordSeparator: String,
 		translatedSymbolSeparator: String,
-	): String? {
+	): String {
 		var wordDelimiter = ""
 		var symbolDelimiter = ""
 
@@ -65,7 +68,7 @@ class SubstitutionCipher(
 			word.trimmedSplit(symbolSeparator).forEach { symbol ->
 				val translatedSymbol = translationMap[symbol] ?: run {
 					_translatedSb.setLength(0)
-					return null
+					throw IllegalArgumentException("Symbol '$symbol' is not in encryptMap $encryptMap")
 				}
 
 				_translatedSb.append(symbolDelimiter).append(translatedSymbol)
@@ -84,14 +87,14 @@ class SubstitutionCipher(
 
 	private inline fun checkValueNotInMap(value: String, lazyMessage: () -> Any) {
 		check(
-			value = value !in encodeMap && value !in encodeMap.values,
+			value = value !in encryptMap && value !in encryptMap.values,
 			lazyMessage = lazyMessage,
 		)
 	}
 
 
 	override fun toString(): String {
-		return "SubstitutionCipher(decodedWordSeparator='$decodedWordSeparator', decodedSymbolSeparator='$decodedSymbolSeparator', encodedWordSeparator='$encodedWordSeparator', encodedSymbolSeparator='$encodedSymbolSeparator, encodeMap='$encodeMap')"
+		return "SubstitutionCipher(symbolSeparator='$symbolSeparator', wordSeparator='$wordSeparator', decryptedWordSeparator='$encryptedWordSeparator', decryptedSymbolSeparator='$encryptedSymbolSeparator, encryptMap='$encryptMap')"
 	}
 
 
@@ -101,21 +104,21 @@ class SubstitutionCipher(
 
 		other as SubstitutionCipher
 
-		if (encodeMap != other.encodeMap) return false
-		if (decodedWordSeparator != other.decodedWordSeparator) return false
-		if (decodedSymbolSeparator != other.decodedSymbolSeparator) return false
-		if (encodedWordSeparator != other.encodedWordSeparator) return false
-		if (encodedSymbolSeparator != other.encodedSymbolSeparator) return false
+		if (encryptMap != other.encryptMap) return false
+		if (symbolSeparator != other.symbolSeparator) return false
+		if (wordSeparator != other.wordSeparator) return false
+		if (encryptedWordSeparator != other.encryptedWordSeparator) return false
+		if (encryptedSymbolSeparator != other.encryptedSymbolSeparator) return false
 
 		return true
 	}
 
 	override fun hashCode(): Int {
-		var result = encodeMap.hashCode()
-		result = 31 * result + decodedWordSeparator.hashCode()
-		result = 31 * result + decodedSymbolSeparator.hashCode()
-		result = 31 * result + encodedWordSeparator.hashCode()
-		result = 31 * result + encodedSymbolSeparator.hashCode()
+		var result = encryptMap.hashCode()
+		result = 31 * result + symbolSeparator.hashCode()
+		result = 31 * result + wordSeparator.hashCode()
+		result = 31 * result + encryptedWordSeparator.hashCode()
+		result = 31 * result + encryptedSymbolSeparator.hashCode()
 		return result
 	}
 }

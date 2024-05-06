@@ -4,49 +4,78 @@ import util.trimmedSplit
 
 class ShiftCipher(
 	val symbolSet: Set<String>,
-	val wordSeparator: String,
 	val symbolSeparator: String,
-	keyCollection: Collection<String> = listOf(symbolSet.first()),
+	val wordSeparator: String,
+	keyCollection: Collection<String> = listOf(symbolSet.firstOrNull() ?: throw IllegalArgumentException("Symbol set can't be empty")),
 	var isZeroBased: Boolean = true,
+	var onConflictStrategy: OnConflictStrategy = OnConflictStrategy.Default,
 ) {
+	private val _symbolSetAsString = symbolSet.joinToString("")
+
+
 	init {
-		checkValueNotInSymbolSet(wordSeparator) {
-			"wordSeparator can't be in symbol set"
+		require(keyCollection.isNotEmpty()) {
+			"Key collection can't be empty"
 		}
-		checkValueNotInSymbolSet(symbolSeparator) {
-			"symbolSeparator can't be in symbol set"
+		requireValueNotInSymbolSet(symbolSeparator) {
+			"Symbol separator can't be in symbol set"
+		}
+		requireValueNotInSymbolSet(wordSeparator) {
+			"Word separator can't be in symbol set"
+		}
+		require(symbolSeparator != wordSeparator) {
+			"Symbol separator and word separator can't be equal"
 		}
 		checkKeySet(keyCollection)
+		checkCharIsNotPresentInBothSeparatorAndSymbolSet()
 	}
 
 
 	var keyCollection: Collection<String> = keyCollection
 		set(value) {
+			require(value.isNotEmpty()) {
+				"Key collection can't be empty"
+			}
 			checkKeySet(value)
 			field = value
 		}
 
-	private val _translatedSb = StringBuilder("")
+	private val _translatedSb = StringBuilder()
 	private val _firstIndex get() = if (isZeroBased) 0 else 1
 
 
-	fun encrypt(decodedText: String): String = translate(decodedText, +1)
+	fun encrypt(decodedText: String): String = translate(decodedText, +1)!!
 
-	fun decrypt(encodedText: String): String = translate(encodedText, -1)
+	fun decrypt(encodedText: String): String = translate(encodedText, -1)!!
+
+	fun encryptOrNull(decodedText: String): String? = translate(decodedText, +1, allowNullResult = true)
+
+	fun decryptOrNull(encodedText: String): String? = translate(encodedText, -1, allowNullResult = true)
 
 
 	private fun translate(
-		stringToTranslate: String,
+		textToTranslate: String,
 		offsetMultiplier: Int,
-	): String {
+		allowNullResult: Boolean = false,
+	): String? {
 		var wordDelimiter = ""
 		var symbolDelimiter = ""
 		var symbolIndex = 0
 
-		stringToTranslate.trim().split(wordSeparator).forEach { word ->
+		textToTranslate.trim().split(wordSeparator).forEach { word ->
 			_translatedSb.append(wordDelimiter)
 
-			word.trimmedSplit(symbolSeparator).forEach { symbol ->
+			word.trimmedSplit(symbolSeparator).forEach word@{ symbol ->
+				if (symbol !in symbolSet) {
+					if (onConflictStrategy == OnConflictStrategy.Ignore) {
+						return@word
+					}
+					if (allowNullResult) {
+						return null
+					}
+					throw IllegalArgumentException("Symbol '$symbol' in text is not in symbol set $symbolSet")
+				}
+
 				val cycleIndex = symbolIndex.mod(keyCollection.size)
 				val offset = symbolSet.indexOf(keyCollection.elementAt(cycleIndex)) + _firstIndex
 				val translatedSymbol = shift(symbol, offset * offsetMultiplier)
@@ -84,16 +113,27 @@ class ShiftCipher(
 		}
 	}
 
-	private inline fun checkValueNotInSymbolSet(value: String, lazyMessage: () -> Any) {
-		check(
+	private inline fun requireValueNotInSymbolSet(value: String, lazyMessage: () -> Any) {
+		require(
 			value = value !in symbolSet,
 			lazyMessage = lazyMessage,
 		)
 	}
 
+	private fun checkCharIsNotPresentInBothSeparatorAndSymbolSet() {
+		for (char in _symbolSetAsString) {
+			if (symbolSeparator != "" && char in symbolSeparator) {
+				throw IllegalArgumentException("The character '$char' can't be in both symbol separator and symbol set")
+			}
+			if (wordSeparator != "" && char in wordSeparator) {
+				throw IllegalArgumentException("The character '$char' can't be in both word separator and symbol set")
+			}
+		}
+	}
+
 
 	override fun toString(): String {
-		return "ShiftCipher(wordSeparator='$wordSeparator', symbolSeparator='$symbolSeparator', keySet='$keyCollection', isZeroBased='$isZeroBased', symbolSet='$symbolSet')"
+		return "ShiftCipher(symbolSeparator='$symbolSeparator', wordSeparator='$wordSeparator', keySet='$keyCollection', isZeroBased='$isZeroBased', symbolSet='$symbolSet')"
 	}
 
 	override fun equals(other: Any?): Boolean {
@@ -103,8 +143,8 @@ class ShiftCipher(
 		other as ShiftCipher
 
 		if (symbolSet != other.symbolSet) return false
-		if (wordSeparator != other.wordSeparator) return false
 		if (symbolSeparator != other.symbolSeparator) return false
+		if (wordSeparator != other.wordSeparator) return false
 		if (isZeroBased != other.isZeroBased) return false
 		if (keyCollection != other.keyCollection) return false
 
@@ -113,11 +153,17 @@ class ShiftCipher(
 
 	override fun hashCode(): Int {
 		var result = symbolSet.hashCode()
-		result = 31 * result + wordSeparator.hashCode()
 		result = 31 * result + symbolSeparator.hashCode()
+		result = 31 * result + wordSeparator.hashCode()
 		result = 31 * result + isZeroBased.hashCode()
 		result = 31 * result + keyCollection.hashCode()
 		return result
+	}
+
+
+	enum class OnConflictStrategy {
+		Ignore,
+		Default,
 	}
 }
 
@@ -130,10 +176,10 @@ var ShiftCipher.key: String
 			throw IllegalArgumentException("key can't be blank")
 		}
 
-		val keySet = value.trimmedSplit(symbolSeparator).toList()
+		val keySet = value.replace(wordSeparator, "").trimmedSplit(symbolSeparator).toList()
 
 		keySet.forEach { symbol ->
-			if (symbol != symbolSeparator && symbolSeparator != wordSeparator && symbol !in symbolSet) {
+			if (symbol != symbolSeparator && symbol !in symbolSet) {
 				throw IllegalArgumentException("Symbol '$symbol' is different from symbolSeparator '$symbolSeparator' and wordSeparator '$wordSeparator' and it's not in symbol set '$symbolSet'")
 			}
 		}
