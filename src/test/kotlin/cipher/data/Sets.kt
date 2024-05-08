@@ -1,6 +1,6 @@
 package cipher.data
 
-val AlphabetSet = setOf(
+val AlphabetSet = listOf(
 	"a",
 	"b",
 	"c",
@@ -29,7 +29,7 @@ val AlphabetSet = setOf(
 	"z",
 )
 
-val MorseSet = setOf(
+val MorseSet = listOf(
 	".-",
 	"-...",
 	"-.-.",

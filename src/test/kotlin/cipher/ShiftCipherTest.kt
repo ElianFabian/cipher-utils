@@ -27,7 +27,7 @@ internal class ShiftCipherTest {
 	fun `Symbol set can't be empty`() {
 		assertFailsWith<IllegalArgumentException> {
 			ShiftCipher(
-				symbolSet = emptySet(),
+				symbolSet = emptyList(),
 				symbolSeparator = "",
 				wordSeparator = " ",
 			)
@@ -141,7 +141,7 @@ internal class ShiftCipherTest {
 
 	@Test
 	fun `Character can't be in both symbol separator and symbol set`() {
-		val set = setOf("alpha", "beta", "delta")
+		val set = listOf("alpha", "beta", "delta")
 		val characters = set.joinToString("")
 
 		characters.forEach { char ->
@@ -157,7 +157,7 @@ internal class ShiftCipherTest {
 
 	@Test
 	fun `Character can't be in both word separator and symbol set`() {
-		val set = setOf("alpha", "beta", "delta")
+		val set = listOf("alpha", "beta", "delta")
 		val characters = set.joinToString("")
 
 		characters.forEach { char ->
